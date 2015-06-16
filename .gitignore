@@ -1,0 +1,12 @@
+/package.box
+/index.html
+*~
+/.vagrant/
+/nohup.out
+
+# Gradle wrapper
+/.gradle/
+
+# Eclipse
+.project
+*.box
