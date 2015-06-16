@@ -6,7 +6,13 @@
 
 # When you push to a repo, this is the user that will be used
 DEVELOPER_ID = ENV['USER']
-MACHINE_NAME = ARGV[1]
+
+MACHINE_NAME = ENV['MACHINE']
+
+if MACHINE_NAME.nil?
+	MACHINE_NAME = "anonymous"
+end 
+
 puts "Machinename is [#{MACHINE_NAME}]"
 # USER on Linux
 # USERNAME on Windows
