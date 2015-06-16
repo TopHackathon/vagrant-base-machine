@@ -41,7 +41,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	(["dev"]).each do |setup_dev_env|
 		config.vm.define "#{setup_dev_env}" do |machine|
 		
-		    machine.vm.network "public_network"
+		    machine.vm.network "public_network", bridge: 'wlan0'
 		
 			# Latest Docker
 			machine.vm.provision "shell", path: "docker.sh", args:[DEVELOPER_ID]
