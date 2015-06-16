@@ -5,8 +5,6 @@
 # This section allows you to parametrize the vagrant build process.
 
 # When you push to a repo, this is the user that will be used
-DEVELOPER_ID = ENV['USER']
-
 MACHINE_NAME = ENV['MACHINE']
 
 if MACHINE_NAME.nil?
@@ -16,12 +14,6 @@ end
 puts "Machinename is [#{MACHINE_NAME}]"
 # USER on Linux
 # USERNAME on Windows
-
-if DEVELOPER_ID.empty?
-	DEVELOPER_ID = "anonymous"
-end 
-
-puts "Developer id is [#{DEVELOPER_ID}]"
 
 #####################################################################################
 
@@ -52,7 +44,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		
 		# The ports are forwarded 'as is' by default.
 		#config.vm.network "forwarded_port", guest: 4243, host: 4243
-		config.vm.network "forwarded_port", guest: 8080, host: 8888
+		#config.vm.network "forwarded_port", guest: 8080, host: 9
 	end
 
 	([MACHINE_NAME]).each do |setup_dev_env|
@@ -60,7 +52,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		    machine.vm.network "public_network", bridge: 'wlan0'
 		
 			# Latest Docker
-			machine.vm.provision "shell", path: "docker.sh", args:[DEVELOPER_ID]
+			machine.vm.provision "shell", path: "docker.sh"
 			machine.vm.provision "shell", path: "docker-compose.sh"
 		end 
 	end
