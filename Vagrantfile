@@ -27,7 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		dev.vm.box = "jesperwermuth/Ubuntu-14-04-Headless"
 		dev.vm.box_url = "https://atlas.hashicorp.com/jesperwermuth/Ubuntu-14-04-Headless"
 	    dev.vm.provider :virtualbox do |vb|
-			vb.gui = true
+			vb.gui = false
 			vb.customize ["modifyvm", :id, "--memory", "2048"]
 			vb.customize ["modifyvm", :id, "--cpus", "2"]
 			vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
