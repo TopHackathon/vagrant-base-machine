@@ -6,6 +6,8 @@
 
 # When you push to a repo, this is the user that will be used
 DEVELOPER_ID = ENV['USER']
+MACHINE_NAME = ARGV[1]
+puts "Machinename is [#{MACHINE_NAME}]"
 # USER on Linux
 # USERNAME on Windows
 
@@ -21,7 +23,7 @@ puts "Developer id is [#{DEVELOPER_ID}]"
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-	config.vm.define "dev" do |dev|
+	config.vm.define MACHINE_NAME do |dev|
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
 		dev.vm.box_download_insecure = "jesperwermuth/Ubuntu-14-04-Headless"
 		dev.vm.box = "jesperwermuth/Ubuntu-14-04-Headless"
@@ -38,9 +40,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		end
 	end
 
-	(["dev"]).each do |setup_dev_env|
+	([MACHINE_NAME]).each do |setup_dev_env|
 		config.vm.define "#{setup_dev_env}" do |machine|
-		
 		    machine.vm.network "public_network", bridge: 'wlan0'
 		
 			# Latest Docker
