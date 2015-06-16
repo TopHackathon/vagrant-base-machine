@@ -28,6 +28,11 @@ puts "Developer id is [#{DEVELOPER_ID}]"
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
+
+## TODO 
+# -H=unix:///var/run/docker.sock -H=0.0.0.0:4243 
+# should be automaticall configured...
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.define MACHINE_NAME do |dev|
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
@@ -44,6 +49,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vb.customize ["modifyvm", :id, "--vram", "128"]
 			vb.customize ["modifyvm", :id, "--hwvirtex", "on"] 
 		end
+		
+		# The ports are forwarded 'as is' by default.
+		#config.vm.network "forwarded_port", guest: 4243, host: 4243
+		config.vm.network "forwarded_port", guest: 8080, host: 8888
 	end
 
 	([MACHINE_NAME]).each do |setup_dev_env|
