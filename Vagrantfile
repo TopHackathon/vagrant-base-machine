@@ -5,13 +5,13 @@
 # This section allows you to parametrize the vagrant build process.
 
 # When you push to a repo, this is the user that will be used
-MACHINE_NAME = ENV['MACHINE']
 
-if MACHINE_NAME.nil?
+if ENV['MACHINE'].nil?
 	MACHINE_NAME = "anonymous"
+else
+    MACHINE_NAME = ENV['MACHINE']
 end 
 
-puts "Machinename is [#{MACHINE_NAME}]"
 # USER on Linux
 # USERNAME on Windows
 
@@ -27,6 +27,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.define MACHINE_NAME do |dev|
+        puts "Machine name is [#{MACHINE_NAME}]"
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
 		dev.vm.box_download_insecure = "jesperwermuth/Ubuntu-14-04-Headless"
 		dev.vm.box = "jesperwermuth/Ubuntu-14-04-Headless"
