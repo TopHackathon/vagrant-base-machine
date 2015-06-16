@@ -3,6 +3,6 @@
 MACHINE=$1 vagrant halt
 MACHINE=$1 vagrant up
 # IP = get IP
-IP=10.10.1.116
+IP=$(vagrant ssh $1 -c 'ifconfig eth1 | grep "inet "' | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
 docker -H $IP:4243 $2
 
