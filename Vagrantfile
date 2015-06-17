@@ -26,6 +26,7 @@ VAGRANTFILE_API_VERSION = "2"
 # should be automaticall configured...
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
 	config.vm.define MACHINE_NAME do |dev|
         puts "Machine name is [#{MACHINE_NAME}]"
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
@@ -54,7 +55,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		
 			# Latest Docker
 			machine.vm.provision "shell", path: "docker.sh"
-			machine.vm.provision "shell", path: "docker-compose.sh"
 		end 
 	end
 end
