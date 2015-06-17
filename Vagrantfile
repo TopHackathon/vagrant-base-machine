@@ -12,6 +12,7 @@ else
     MACHINE_NAME = ENV['MACHINE']
 end 
 
+BOX_NAME="jesperwermuth/Ubuntu-14-04-Top-Dockerhost"
 # USER on Linux
 # USERNAME on Windows
 
@@ -30,9 +31,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.define MACHINE_NAME do |dev|
         puts "Machine name is [#{MACHINE_NAME}]"
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
-		dev.vm.box_download_insecure = "jesperwermuth/Ubuntu-14-04-Headless"
-		dev.vm.box = "jesperwermuth/Ubuntu-14-04-Headless"
-		dev.vm.box_url = "https://atlas.hashicorp.com/jesperwermuth/Ubuntu-14-04-Headless"
+		dev.vm.box_download_insecure = BOX_NAME
+		dev.vm.box = BOX_NAME
+		dev.vm.box_url = "https://atlas.hashicorp.com/" + BOX_NAME
 	    dev.vm.provider :virtualbox do |vb|
 			vb.gui = false
 			vb.customize ["modifyvm", :id, "--memory", "2048"]
