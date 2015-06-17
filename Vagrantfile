@@ -55,7 +55,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		    machine.vm.network "public_network", bridge: 'wlan0'
 		
 			# Latest Docker (not needed anymore, already in Ubuntu-14-04-Top-Dockerhost image)
-			machine.vm.provision "shell", path: "docker.sh"
+			#machine.vm.provision "shell", path: "docker.sh"
 		end 
 	end
 end
