@@ -44,10 +44,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vb.customize ["modifyvm", :id, "--vram", "128"]
 			vb.customize ["modifyvm", :id, "--hwvirtex", "on"] 
 		end
-		
 		# The ports are forwarded 'as is' by default.
-		#config.vm.network "forwarded_port", guest: 4243, host: 4243
-		#config.vm.network "forwarded_port", guest: 8080, host: 9
 	end
 
 	([MACHINE_NAME]).each do |setup_dev_env|
@@ -56,6 +53,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 		
 			# Latest Docker (not needed anymore, already in Ubuntu-14-04-Top-Dockerhost image)
 			#machine.vm.provision "shell", path: "docker.sh"
+			# Allow anyone to connect to docker host and allow usage of an unsecure-registry
+			config.vm.provision "shell", inline: "sudo echo DOCKER_OPTS=\"-H=unix:///var/run/docker.sock -H=0.0.0.0:4243 --insecure-registry 192.168.1.24:5000\" >> /etc/default/docker"
+			# Restart docker to re-read /etc/default/docker file
+			config.vm.provision "shell", inline: "sudo service docker restart && sleep 3"
 		end 
 	end
 end
