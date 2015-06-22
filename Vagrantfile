@@ -4,17 +4,14 @@
 #### USER PARAMETERIZE ##############################################################
 # This section allows you to parametrize the vagrant build process.
 
-# When you push to a repo, this is the user that will be used
 
 if ENV['MACHINE'].nil?
-	MACHINE_NAME = "anonymous"
+	MACHINE = "default"
 else
-    MACHINE_NAME = ENV['MACHINE']
+    MACHINE = ENV['MACHINE']
 end 
 
-BOX_NAME="Top-Dockerhost"
-# USER on Linux
-# USERNAME on Windows
+BOX_NAME="jesperwermuth/Ubuntu-14-04-Top-Dockerhost"
 
 #####################################################################################
 
@@ -22,16 +19,10 @@ BOX_NAME="Top-Dockerhost"
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
-	config.vm.define MACHINE_NAME do |dev|
-        #puts "Machine name is [#{MACHINE_NAME}]"
-	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
-		dev.vm.box_download_insecure = BOX_NAME
-		dev.vm.box = BOX_NAME
-		dev.vm.box_url = "https://atlas.hashicorp.com/" + BOX_NAME
-	    dev.vm.provider :virtualbox do |vb|
+    config.vm.define MACHINE do |config|
+	    config.vm.provider :virtualbox do |vb|
 			vb.gui = false
-			vb.name = 'TopDockerHost'
+			#vb.name = 'TopDockerHost'
 			vb.customize ["modifyvm", :id, "--memory", "2048"]
 			vb.customize ["modifyvm", :id, "--cpus", "2"]
 			vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
@@ -40,27 +31,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vb.customize ["modifyvm", :id, "--vram", "128"]
 			vb.customize ["modifyvm", :id, "--hwvirtex", "on"] 
 		end
-		# The ports are forwarded 'as is' by default.
-	end
 
-	([MACHINE_NAME]).each do |setup_dev_env|
-		config.vm.define "#{setup_dev_env}" do |machine|
-		    # Get your IP from DHCP and choose a network called wlan0, if present.
-		    # If wlan0 is not present vagrant will ask you to choose from a list
-		    #machine.vm.network "public_network", bridge: 'wlan0'
-		    # If you have problems with public networks, try a private one
-		    machine.vm.network "private_network", ip: "192.168.33.10"
-		
-			# Latest Docker (not needed anymore, already in Ubuntu-14-04-Top-Dockerhost image)
-			#machine.vm.provision "shell", path: "docker.sh"
-			# Allow anyone to connect to docker host and allow usage of an unsecure-registry
-			#config.vm.provision "shell", inline: "sudo echo DOCKER_OPTS=\'-H=unix:///var/run/docker.sock -H=0.0.0.0:4243 --insecure-registry 192.168.1.24:5000\' >> /etc/default/docker"
-			
-			# this works from a shell>\:
-			config.vm.provision "shell", path:  "docker-configure.sh"
-			
-			# Restart docker to re-read /etc/default/docker file
-			config.vm.provision "shell", inline: "sudo service docker restart && sleep 3"
-		end 
-	end
+        #puts "Machine name is [#{MACHINE_NAME}]"
+	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
+		config.vm.box = BOX_NAME
+		config.vm.box_download_insecure = BOX_NAME
+		config.vm.hostname = MACHINE
+		config.vm.box_url = "https://atlas.hashicorp.com/" + BOX_NAME
+        config.vm.provision "shell", path:  "docker-configure.sh"
+        config.vm.provision "shell", inline: "sudo service docker restart && sleep 3"
+		config.vm.network "private_network", ip: "192.168.33.10"
+
+		# The ports are forwarded 'as is' by default.
+    end
 end
