@@ -11,9 +11,57 @@ echo "You can input any docker command you want. It will be executed on the newl
 exit 1
 fi
 
-MACHINE=$1 vagrant destroy --force
-MACHINE=$1 vagrant up
-IP=$(MACHINE=$1 vagrant ssh -c 'ifconfig eth1' | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
-docker -H $IP:4243 $2
-echo Congratulation, you can tie your tie on $IP
+#Default
+RUNTIME_RESTPORT=2376
+
+while [[ $# > 0 ]]
+do
+key="$1"
+
+case $key in
+    -e|--ci-environment)
+    CI_ENVIRONMENT+="-e $2 "
+    shift # past argument
+    ;;
+    -p|--runtime-portmaps)
+    RUNTIME_PORTMAPS="$2"
+    shift # past argument
+    ;;
+    -r|--runtime-restport)
+    RUNTIME_RESTPORT="$2"
+    shift # past argument
+    ;;
+    -i|--runtime-imagename)
+    RUNTIME_IMAGENAME="$2"
+    shift # past argument
+    ;;
+    --pull-first)
+    PULL_FIRST="$2"
+    shift # past argument
+    ;;
+    -m|--machine-name)
+    MACHINE="$2"
+    shift # past argument
+    ;;
+    -d|--docker-command)
+    DOCKER_COMMAND="$2"
+    shift # past argument
+    ;;
+    *)
+    echo "Unknown option $2"
+    ;;
+esac
+shift # past argument or value
+done
+
+MACHINE=$MACHINE vagrant destroy --force
+MACHINE=$MACHINE vagrant up
+IP=$(MACHINE=$MACHINE vagrant ssh -c 'ifconfig eth1' | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
+#docker -H $IP:4243 $ENVIRONMENT $2
+if [ -n "$PULL_FIRST" ]; then
+docker -H $IP:4243 pull $PULL_FIRST
+fi
+docker $CI_ENVIRONMENT -H $IP:4243 $DOCKER_COMMAND
+
+echo Congratulation, you may now tie your tie on $IP
 
