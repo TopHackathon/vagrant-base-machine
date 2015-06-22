@@ -54,12 +54,15 @@ esac
 shift # past argument or value
 done
 
+echo re-creating machine $MACHINE
 MACHINE=$MACHINE vagrant destroy --force
-MACHINE=$MACHINE vagrant up
+MACHINE=$MACHINE vagrant up --debug
+echo Querying machine for 
 IP=$(MACHINE=$MACHINE vagrant ssh -c 'ifconfig eth1' | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
-#docker -H $IP:4243 $ENVIRONMENT $2
+echo "Machine with ip [$IP]s created"
+
 if [ -n "$PULL_FIRST" ]; then
-docker -H $IP:4243 pull $PULL_FIRST
+    docker -H $IP:4243 pull $PULL_FIRST
 fi
 docker $CI_ENVIRONMENT -H $IP:4243 $DOCKER_COMMAND
 

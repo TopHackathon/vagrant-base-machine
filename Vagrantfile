@@ -12,7 +12,7 @@ else
     MACHINE_NAME = ENV['MACHINE']
 end 
 
-BOX_NAME="jesperwermuth/Ubuntu-14-04-Top-Dockerhost"
+BOX_NAME="Top-Dockerhost"
 # USER on Linux
 # USERNAME on Windows
 
@@ -21,21 +21,17 @@ BOX_NAME="jesperwermuth/Ubuntu-14-04-Top-Dockerhost"
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
-
-## TODO 
-# -H=unix:///var/run/docker.sock -H=0.0.0.0:4243 
-# should be automaticall configured...
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	config.vm.define MACHINE_NAME do |dev|
-        puts "Machine name is [#{MACHINE_NAME}]"
+        #puts "Machine name is [#{MACHINE_NAME}]"
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
 		dev.vm.box_download_insecure = BOX_NAME
 		dev.vm.box = BOX_NAME
 		dev.vm.box_url = "https://atlas.hashicorp.com/" + BOX_NAME
 	    dev.vm.provider :virtualbox do |vb|
 			vb.gui = false
+			vb.name = 'TopDockerHost'
 			vb.customize ["modifyvm", :id, "--memory", "2048"]
 			vb.customize ["modifyvm", :id, "--cpus", "2"]
 			vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxvga"]
@@ -49,12 +45,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 	([MACHINE_NAME]).each do |setup_dev_env|
 		config.vm.define "#{setup_dev_env}" do |machine|
-		    machine.vm.network "public_network", bridge: 'wlan0'
+		    # Get your IP from DHCP and choose a network called wlan0, if present.
+		    # If wlan0 is not present vagrant will ask you to choose from a list
+		    #machine.vm.network "public_network", bridge: 'wlan0'
+		    # If you have problems with public networks, try a private one
+		    machine.vm.network "private_network", ip: "192.168.33.10"
 		
 			# Latest Docker (not needed anymore, already in Ubuntu-14-04-Top-Dockerhost image)
 			#machine.vm.provision "shell", path: "docker.sh"
 			# Allow anyone to connect to docker host and allow usage of an unsecure-registry
-			config.vm.provision "shell", inline: "sudo echo DOCKER_OPTS=\"-H=unix:///var/run/docker.sock -H=0.0.0.0:4243 --insecure-registry 192.168.1.24:5000\" >> /etc/default/docker"
+			#config.vm.provision "shell", inline: "sudo echo DOCKER_OPTS=\'-H=unix:///var/run/docker.sock -H=0.0.0.0:4243 --insecure-registry 192.168.1.24:5000\' >> /etc/default/docker"
+			
+			# this works from a shell>\:
+			config.vm.provision "shell", path:  "docker-configure.sh"
+			
 			# Restart docker to re-read /etc/default/docker file
 			config.vm.provision "shell", inline: "sudo service docker restart && sleep 3"
 		end 
