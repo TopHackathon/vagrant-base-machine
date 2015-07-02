@@ -3,6 +3,7 @@
 #
 # See https://docs.docker.com/registry/deploying/
 
+
 registry:
   restart: always
   image: registry:2
