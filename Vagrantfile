@@ -1,3 +1,18 @@
+# Usage : 
+#	vagrant up - starts the default machine "tie"
+# 	MACHINE=someId up : starts machine someId
+#   MACHINE=someId halt : stops machine someId
+#   etc. etc.
+
+#TODO upload image with pull to Atlas *for better performance*
+#TODO usage message
+##TODO import Nikolajs new stuff
+#TODO import Jons stuff
+#TODO import Mads Tvedes stuff
+#TODO make callable in a more reproducable way
+#TODO setup registry locally
+#TODO initialize registry with our own dockerfiles
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -6,7 +21,7 @@
 
 
 if ENV['MACHINE'].nil?
-	MACHINE = "default"
+	MACHINE = "tie"
 else
     MACHINE = ENV['MACHINE']
 end 
@@ -31,7 +46,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 			vb.customize ["modifyvm", :id, "--vram", "128"]
 			vb.customize ["modifyvm", :id, "--hwvirtex", "on"] 
 		end
-
+		
+		# Automatically use local apt-cacher-ng if available
+		if File.exists? "/etc/apt-cacher-ng"
+		require 'socket'
+		guessed_address = Socket.ip_address_list.detect{|intf| !intf.ipv4_loopback?}
+		    if guessed_address 
+		      config.vm.provision :shell, :inline => "echo 'Acquire::http { Proxy \"http://#{guessed_address.ip_address}:3142\"; };' > /etc/apt/apt.conf.d/00proxy"
+		    end
+		end
+		
         #puts "Machine name is [#{MACHINE_NAME}]"
 	 	# box_download_insecure is a hack to cover up for curl certificate error. See https://github.com/jeroenjanssens/data-science-at-the-command-line/issues/29
 		config.vm.box = BOX_NAME
@@ -44,4 +68,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 		# The ports are forwarded 'as is' by default.
     end
+    
+    # run with vagrant up registry --provider="docker"
+    config.vm.define "registry" do |a|
+    # docker run -p 5000:5000 -v /var/dockerregistry/:/tmp/registry-dev registry
+#    a.autostart = false
+    a.vm.provider "docker" do |d|
+      d.image = "registry"
+      d.build_args = ["-t=registry"]
+      d.ports = ["5000:5000"]
+      d.name = "registry"
+      d.remains_running = true
+      d.volumes = ["/myregistrydata:/var/lib/registry"]
+    end
+  end
+  
 end
