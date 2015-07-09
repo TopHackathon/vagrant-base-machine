@@ -10,3 +10,4 @@
 # Eclipse
 .project
 *.box
+registry-data
