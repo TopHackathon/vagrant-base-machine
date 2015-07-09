@@ -12,6 +12,6 @@ fi
 
 for var in "$@"
 do
-  ./tie-up.sh --machine-name $var -e PORTMAPS="8088:8088" -e RESTPORT=4243 -e GIT.URL=https://github.com/TopHackathon/example-app.git -e IMAGETAGNAME=tophackathon/newapp --docker-command "run -d -p 8080:8080 tophackathon/ci-java8:1.3"
+  ./tie-up.sh --machine-name $var -e PORTMAPS="8088:8080" -e RESTPORT=4243 -e GIT.URL=https://github.com/TopHackathon/example-app.git -e IMAGETAGNAME=tophackathon/newapp --docker-command "run -d -p 8080:8080 192.168.9.5:5000/jesper/ci-java8:1.3"
 done
 

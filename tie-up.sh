@@ -3,7 +3,6 @@
 # Stop executin of this script if any error occurs.
 set -e
 # Echo executables for debugging / info
-set -o verbose
 
 USAGE+=$'\n\t-e|--ci-environment		Set environment variables on the CI docker container, e.g. -e PORTMAPS=8088:8088'
 USAGE+=$'\n\t				Jenkins image expects the following environment variables:'
@@ -14,6 +13,8 @@ USAGE+=$'\n\t					-e IMAGETAGNAME=tophackathon/newapp'
 USAGE+=$'\n\t--pull-first IMAGE		Force a pull of IMAGE '
 USAGE+=$'\n\t-d|--docker-command COMMAND	Anything after the docker command e.g. --docker-command "run -d -p 8080:8080 tophackathon/ci-java8:1.3"'
 USAGE+=$'\n\t-m|--machine-name MACHINE	Environment name.'
+USAGE+=$'\n\t-m|--machine-name MACHINE	Environment name.'
+USAGE+=$'\n\t--docker-host-port The port you contact docker on. Defaults to 4243. e.g. docker -H IP:4243 ps
 USAGE+=$'\n'
 USAGE+=$'\n\t-> IP Ip of the machine/environment created for you'
 
@@ -28,6 +29,9 @@ if [ $# -eq 0 ]; then
 	exit 1
 fi
 
+# Default docker host port
+DOCKER_HOST_PORT=4243
+
 while [[ $# > 0 ]]
 do
 	key="$1"
@@ -39,6 +43,10 @@ do
 	    ;;
 	    --pull-first)
 	    PULL_FIRST="$2"
+	    shift # past argument
+	    ;;
+	    --docker-host-port)
+	    DOCKER_HOST_PORT="$2"
 	    shift # past argument
 	    ;;
 	    -m|--machine-name)
@@ -56,17 +64,19 @@ do
 	shift # past argument or value
 done
 
-echo recreating machine $MACHINE
+echo Destroying machine $MACHINE if it exists
 MACHINE=$MACHINE vagrant destroy --force
+echo Creating machine $MACHINE
 MACHINE=$MACHINE vagrant up --debug
-echo Querying machine for 
+
+echo Querying machine for ip 
 IP=$(MACHINE=$MACHINE vagrant ssh -c 'ifconfig eth1' | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
-echo "Machine with ip [$IP] created, starting docker configuration."
+echo "Machine with ip [$IP] created. Starting creation of CI (jenkins) environment."
 CI_ENVIRONMENT+="-e MYIP=$IP "
 
 if [ -n "$PULL_FIRST" ]; then
-    docker -H $IP:4243 pull $PULL_FIRST
+    docker -H $IP:$DOCKER_HOST_PORT pull $PULL_FIRST
 fi
-docker $CI_ENVIRONMENT -H $IP:4243 $DOCKER_COMMAND
+docker $CI_ENVIRONMENT -H $IP:$DOCKER_HOST_PORT $DOCKER_COMMAND
 
 echo Congratulation, you may now tie your tie on $IP
