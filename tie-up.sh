@@ -8,7 +8,7 @@ set -o verbose
 USAGE+=$'\n\t-e|--ci-environment		Set environment variables on the CI docker container, e.g. -e PORTMAPS=8088:8088'
 USAGE+=$'\n\t				Jenkins image expects the following environment variables:'
 USAGE+=$'\n\t					-e PORTMAPS="8088:8088"'
-USAGE+=$'\n\t					-e RESTPORT=2376'			
+USAGE+=$'\n\t					-e RESTPORT=4243'			
 USAGE+=$'\n\t					-e GIT.URL=https://github.com/TopHackathon/example-app.git'
 USAGE+=$'\n\t					-e IMAGETAGNAME=tophackathon/newapp'
 USAGE+=$'\n\t--pull-first IMAGE		Force a pull of IMAGE '
@@ -56,7 +56,7 @@ do
 	shift # past argument or value
 done
 
-echo (re?)creating machine $MACHINE
+echo recreating machine $MACHINE
 MACHINE=$MACHINE vagrant destroy --force
 MACHINE=$MACHINE vagrant up --debug
 echo Querying machine for 
