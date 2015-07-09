@@ -39,10 +39,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 	config.vm.box_download_insecure = BOX_NAME
 	config.vm.hostname = MACHINE
 	config.vm.box_url = "https://atlas.hashicorp.com/" + BOX_NAME
+	config.vm.network "private_network", ip: "192.168.33.10"
+	#config.vm.provision "file", source: "/home/jesper/workspaces/top/vagrant-base-machine/certs.d", destination: "/tmp/certs.d"
+	#config.vm.provision "shell", inline: "sudo mkdir -p /etc/docker/certs.d/myregistry.com:5000 && sudo cp -r /tmp/certs.d/* /etc/docker/certs.d/myregistry.com:5000"
     config.vm.provision "shell", path:  "docker-configure.sh"
     config.vm.provision "shell", inline: "sudo service docker restart && sleep 3"
-	config.vm.network "private_network", ip: "192.168.33.10"
-
 
     config.vm.define MACHINE do |config|
 	    config.vm.provider :virtualbox do |vb|
