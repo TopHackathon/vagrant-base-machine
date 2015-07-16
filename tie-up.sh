@@ -18,7 +18,7 @@ USAGE+=$'\n\t --pull-first IMAGE		Force a pull of IMAGE '
 USAGE+=$'\n\t -d|--docker-command COMMAND	Anything after the docker run command e.g. --docker-command "-d -p 8080:8080 tophackathon/ci-java8:1.3"'
 USAGE+=$'\n\t -m|--machine-name MACHINE	Environment name.'
 USAGE+=$'\n\t -m|--machine-name MACHINE	Environment name.'
-USAGE+=$'\n\t --destroy-tie true|false Defaults to false If set to true, any existing MACHINE will be destroyed first.'
+USAGE+=$'\n\t --destroy-host true|false Defaults to false If set to true, any existing MACHINE will be destroyed first.'
 USAGE+=$'\n\t --destroy-container true|false Defaults to true If set to true, any existing CONTAINER on MACHINE with CONTAINER_NAME will be destroyed first.'
 USAGE+=$'\n\t --docker-host-port The port you contact docker on. Defaults to 4243. e.g. docker -H IP:4243 ps'
 USAGE+=$'\n'
@@ -40,7 +40,7 @@ fi
 
 # Defaults 
 DOCKER_HOST_PORT=4243
-DESTROY_TIE=false
+DESTROY_HOST=false
 DESTROY_CONTAINER=true
 CONTAINER_NAME=""
 DOCKER_CONTAINER_NAME_PARAMETER_VALUE=""
@@ -66,8 +66,8 @@ do
 	    CI_ENVIRONMENT+="-e $2 "
 	    shift # past argument
 	    ;;
-	    --destroy-tie)
-	    DESTROY_TIE=$2
+	    --destroy-host)
+	    DESTROY_HOST=$2
 	    shift
 	    ;;
 	    --destroy-container)
@@ -97,7 +97,7 @@ do
 	shift # past argument or value
 done
 
-if [ "$DESTROY_TIE" = true ] ; then
+if [ "$DESTROY_HOST" = true ] ; then
 	echo Destroying machine $MACHINE if it exists
 	MACHINE=$MACHINE vagrant destroy --force
 fi
@@ -137,9 +137,6 @@ CONTAINER_ID=$(docker -H $IP:$DOCKER_HOST_PORT run $DOCKER_CONTAINER_NAME_PARAME
 CONTAINER_NAME=$(docker -H $IP:$DOCKER_HOST_PORT inspect -f '{{ .Name }}' $CONTAINER_ID)
 CONTAINER_PORT=$(docker -H $IP:$DOCKER_HOST_PORT inspect --format='{{(index (index .NetworkSettings.Ports "8080/tcp") 0).HostPort}}' $CONTAINER_NAME)
 
-echo Congratulation, you may now tie your tie on $IP 
-echo Container id $CONTAINER_ID
-out=${CONTAINER_NAME:1}
-echo Container name $out
+echo Congratulations you can visit you jenkins instance at : 
 echo "http://"$IP:$CONTAINER_PORT
 
