@@ -12,11 +12,14 @@ fi
 
 for var in "$@"
 do
+
+	exit 0
   ./tie-up.sh --machine-name $var \
   			  --container-name $var \
   								  -e PORTMAPS="8088:8080" -e RESTPORT=4243 \
   								  -e GIT.URL=https://github.com/TopHackathon/example-app.git \
   								  -e IMAGETAGNAME=tophackathon/newapp \
+  								  -e APPCONTAINERNAME=$var"test" \
   								  --docker-command "-d -p 8080 tophackathon/ci-java8:1.3"
 done
 
