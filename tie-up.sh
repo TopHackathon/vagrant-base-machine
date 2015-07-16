@@ -4,19 +4,19 @@
 set -e
 # Echo executables for debugging / info
 
-USAGE+=$'\n\t-e|--ci-environment		Set environment variables on the CI docker container, e.g. -e PORTMAPS=8088:8088'
+USAGE+=$'\n\t -e|--ci-environment Set environment variables on the CI docker container, e.g. -e PORTMAPS=8088:8088'
 USAGE+=$'\n\t				Jenkins image expects the following environment variables:'
 USAGE+=$'\n\t					-e PORTMAPS="8088:8088"'
 USAGE+=$'\n\t					-e RESTPORT=4243'			
 USAGE+=$'\n\t					-e GIT.URL=https://github.com/TopHackathon/example-app.git'
 USAGE+=$'\n\t					-e IMAGETAGNAME=tophackathon/newapp'
-USAGE+=$'\n\t--pull-first IMAGE		Force a pull of IMAGE '
-USAGE+=$'\n\t-d|--docker-command COMMAND	Anything after the docker command e.g. --docker-command "run -d -p 8080:8080 tophackathon/ci-java8:1.3"'
-USAGE+=$'\n\t-m|--machine-name MACHINE	Environment name.'
-USAGE+=$'\n\t-m|--machine-name MACHINE	Environment name.'
-USAGE+=$'\n\t--docker-host-port The port you contact docker on. Defaults to 4243. e.g. docker -H IP:4243 ps
+USAGE+=$'\n\t --pull-first IMAGE		Force a pull of IMAGE '
+USAGE+=$'\n\t -d|--docker-command COMMAND	Anything after the docker command e.g. --docker-command "run -d -p 8080:8080 tophackathon/ci-java8:1.3"'
+USAGE+=$'\n\t -m|--machine-name MACHINE	Environment name.'
+USAGE+=$'\n\t -m|--machine-name MACHINE	Environment name.'
+USAGE+=$'\n\t --docker-host-port The port you contact docker on. Defaults to 4243. e.g. docker -H IP:4243 ps'
 USAGE+=$'\n'
-USAGE+=$'\n\t-> IP Ip of the machine/environment created for you'
+USAGE+=$'\n\t outputs IP Ip of the machine/environment created for you'
 
 if [ $# -eq 0 ]; then
 	echo $0 "creates a docker host and gives you back the IP of the host. A jenkins is created on the host, and the Jenkins builds a docker image, and launches it." 
@@ -70,7 +70,7 @@ echo Creating machine $MACHINE
 MACHINE=$MACHINE vagrant up --debug
 
 echo Querying machine for ip 
-IP=$(MACHINE=$MACHINE vagrant ssh -c 'ifconfig eth1' | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
+IP=$(MACHINE=$MACHINE vagrant ssh -c "ifconfig eth1" | grep "inet " | cut -f 2 -d ":" | cut -d " " -f 1)
 echo "Machine with ip [$IP] created. Starting creation of CI (jenkins) environment."
 CI_ENVIRONMENT+="-e MYIP=$IP "
 
